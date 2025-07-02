@@ -21,6 +21,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/my-listings" element={<MyListings />} />
         <Route path="/edit/:index" element={<EditProperty />} /> {/* 👈 NEW ROUTE */}
+      <Route path="/edit/:id" element={<EditProperty />} />
       </Routes>
     </BrowserRouter>
   );

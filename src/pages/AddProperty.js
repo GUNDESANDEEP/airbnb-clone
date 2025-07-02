@@ -14,14 +14,14 @@ export default function AddProperty() {
       alert("❌ Please log in to add a property.");
       return;
     }
-
-    const newProperty = {
-      title,
-      location,
-      price,
-      image,
-      owner: user.email, // Save user's email to identify who added it
-    };
+const newProperty = {
+  id: Date.now(), // ✅ unique ID
+  title,
+  location,
+  price,
+  image,
+  owner: user.email,
+};
 
     const existing = JSON.parse(localStorage.getItem("properties")) || [];
     existing.push(newProperty);

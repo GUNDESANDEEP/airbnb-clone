@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function MyListings() {
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const [listings, setListings] = useState([]);
 
-  // ✅ Load only listings that belong to the logged-in user's email (owner)
   useEffect(() => {
     const allListings = JSON.parse(localStorage.getItem("properties")) || [];
     const userListings = allListings.filter(
@@ -13,21 +13,16 @@ export default function MyListings() {
     setListings(userListings);
   }, [currentUser?.email]);
 
-  // ✅ Delete selected listing
-  const handleDelete = (index) => {
+  const handleDelete = (id) => {
     const allListings = JSON.parse(localStorage.getItem("properties")) || [];
-    const updated = allListings.filter(
-      (prop) =>
-        !(
-          prop.owner === currentUser?.email &&
-          prop.title === listings[index].title
-        )
+    const updatedListings = allListings.filter(
+      (prop) => !(prop.owner === currentUser?.email && prop.id === id)
     );
 
-    localStorage.setItem("properties", JSON.stringify(updated));
+    localStorage.setItem("properties", JSON.stringify(updatedListings));
 
-    // update only this user's listings
-    const updatedUserListings = updated.filter(
+    // update UI state
+    const updatedUserListings = updatedListings.filter(
       (prop) => prop.owner === currentUser?.email
     );
     setListings(updatedUserListings);
@@ -40,7 +35,6 @@ export default function MyListings() {
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">📄 My Listings</h2>
-
       {listings.length === 0 ? (
         <p>No listings found. Add some!</p>
       ) : (
@@ -65,12 +59,20 @@ export default function MyListings() {
             <h3 className="text-xl font-semibold">{property.title}</h3>
             <p>Location: {property.location}</p>
             <p>₹{property.price}/night</p>
-            <button
-              onClick={() => handleDelete(index)}
-              className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-            >
-              🗑 Delete
-            </button>
+            <div className="flex space-x-2 mt-2">
+              <button
+                onClick={() => handleDelete(property.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              >
+                🗑 Delete
+              </button>
+              <Link
+                to={`/edit/${property.id}`}
+                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              >
+                ✏️ Edit
+              </Link>
+            </div>
           </div>
         ))
       )}
