@@ -1,69 +1,79 @@
 import React, { useEffect, useState } from "react";
 
-function MyListings() {
-  const [myProperties, setMyProperties] = useState([]);
+export default function MyListings() {
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const [listings, setListings] = useState([]);
 
-  // Load listings from localStorage
+  // ✅ Load only listings that belong to the logged-in user's email (owner)
   useEffect(() => {
-    const allProperties = JSON.parse(localStorage.getItem("properties")) || [];
-    const currentUser = JSON.parse(localStorage.getItem("user"));
-
-    if (currentUser) {
-      const userProperties = allProperties.filter(
-        (prop) => prop.owner === currentUser.email
-      );
-      setMyProperties(userProperties);
-    }
-  }, []);
-
-  // Handle Delete
-  const handleDelete = (indexToDelete) => {
-    const updated = [...myProperties];
-    updated.splice(indexToDelete, 1);
-    setMyProperties(updated);
-
-    const currentUser = JSON.parse(localStorage.getItem("user"));
-    let all = JSON.parse(localStorage.getItem("properties")) || [];
-    all = all.filter(
-      (p) =>
-        !(p.owner === currentUser.email && p.title === myProperties[indexToDelete].title)
+    const allListings = JSON.parse(localStorage.getItem("properties")) || [];
+    const userListings = allListings.filter(
+      (prop) => prop.owner === currentUser?.email
     );
-    localStorage.setItem("properties", JSON.stringify(all));
+    setListings(userListings);
+  }, [currentUser?.email]);
+
+  // ✅ Delete selected listing
+  const handleDelete = (index) => {
+    const allListings = JSON.parse(localStorage.getItem("properties")) || [];
+    const updated = allListings.filter(
+      (prop) =>
+        !(
+          prop.owner === currentUser?.email &&
+          prop.title === listings[index].title
+        )
+    );
+
+    localStorage.setItem("properties", JSON.stringify(updated));
+
+    // update only this user's listings
+    const updatedUserListings = updated.filter(
+      (prop) => prop.owner === currentUser?.email
+    );
+    setListings(updatedUserListings);
   };
+
+  if (!currentUser) {
+    return <p>Please log in to view your listings.</p>;
+  }
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">🧳 My Listings</h2>
+      <h2 className="text-2xl font-bold mb-4">📄 My Listings</h2>
 
-      {myProperties.length === 0 ? (
-        <p>No listings yet. Add one from "Add Property".</p>
+      {listings.length === 0 ? (
+        <p>No listings found. Add some!</p>
       ) : (
-        <div className="grid md:grid-cols-3 gap-4">
-          {myProperties.map((property, index) => (
-            <div
-              key={index}
-              className="border p-4 rounded shadow-md bg-white relative"
+        listings.map((property, index) => (
+          <div
+            key={index}
+            className="bg-white shadow-md p-4 rounded mb-4 max-w-md"
+          >
+            <img
+              src={
+                property.image?.startsWith("http")
+                  ? property.image
+                  : "https://placehold.co/300x200?text=No+Image"
+              }
+              alt="Property"
+              className="w-full h-48 object-cover mb-2"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://placehold.co/300x200?text=No+Image";
+              }}
+            />
+            <h3 className="text-xl font-semibold">{property.title}</h3>
+            <p>Location: {property.location}</p>
+            <p>₹{property.price}/night</p>
+            <button
+              onClick={() => handleDelete(index)}
+              className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
             >
-              <img
-                src={property.image || "https://placehold.co/300x200?text=No+Image"}
-                alt="Property"
-                className="w-full h-48 object-cover rounded mb-2"
-              />
-              <h3 className="text-xl font-bold">{property.title}</h3>
-              <p>Location: {property.location}</p>
-              <p>₹{property.price}/night</p>
-              <button
-                onClick={() => handleDelete(index)}
-                className="absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold"
-              >
-                🗑 Delete
-              </button>
-            </div>
-          ))}
-        </div>
+              🗑 Delete
+            </button>
+          </div>
+        ))
       )}
     </div>
   );
 }
-
-export default MyListings;
