@@ -1,80 +1,79 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function MyListings() {
+  const [properties, setProperties] = useState([]);
   const currentUser = JSON.parse(localStorage.getItem("user"));
-  const [listings, setListings] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const allListings = JSON.parse(localStorage.getItem("properties")) || [];
-    const userListings = allListings.filter(
-      (prop) => prop.owner === currentUser?.email
-    );
-    setListings(userListings);
-  }, [currentUser?.email]);
+    const stored = JSON.parse(localStorage.getItem("properties")) || [];
+    const mine = stored.filter((prop) => prop.owner === currentUser?.email);
+    setProperties(mine);
+  }, [currentUser]);
 
-  const handleDelete = (id) => {
-    const allListings = JSON.parse(localStorage.getItem("properties")) || [];
-    const updatedListings = allListings.filter(
-      (prop) => !(prop.owner === currentUser?.email && prop.id === id)
+  const handleDelete = (indexToDelete) => {
+    const stored = JSON.parse(localStorage.getItem("properties")) || [];
+    const updated = stored.filter(
+      (prop, index) =>
+        !(
+          prop.owner === currentUser?.email &&
+          properties[indexToDelete].title === prop.title
+        )
     );
 
-    localStorage.setItem("properties", JSON.stringify(updatedListings));
-
-    // update UI state
-    const updatedUserListings = updatedListings.filter(
-      (prop) => prop.owner === currentUser?.email
-    );
-    setListings(updatedUserListings);
+    localStorage.setItem("properties", JSON.stringify(updated));
+    const mine = updated.filter((prop) => prop.owner === currentUser?.email);
+    setProperties(mine);
+    alert("🗑️ Property deleted!");
   };
 
-  if (!currentUser) {
-    return <p>Please log in to view your listings.</p>;
-  }
+  const handleEdit = (index) => {
+    navigate(`/edit/${index}`);
+  };
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">📄 My Listings</h2>
-      {listings.length === 0 ? (
-        <p>No listings found. Add some!</p>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <h2 className="text-2xl font-bold text-center text-indigo-600 mb-6">
+        📋 My Listings
+      </h2>
+
+      {properties.length === 0 ? (
+        <p className="text-center text-gray-600">
+          No listings found. Add some!
+        </p>
       ) : (
-        listings.map((property, index) => (
-          <div
-            key={index}
-            className="bg-white shadow-md p-4 rounded mb-4 max-w-md"
-          >
-            <img
-              src={
-                property.image?.startsWith("http")
-                  ? property.image
-                  : "https://placehold.co/300x200?text=No+Image"
-              }
-              alt="Property"
-              className="w-full h-48 object-cover mb-2"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "https://placehold.co/300x200?text=No+Image";
-              }}
-            />
-            <h3 className="text-xl font-semibold">{property.title}</h3>
-            <p>Location: {property.location}</p>
-            <p>₹{property.price}/night</p>
-            <div className="flex space-x-2 mt-2">
-              <button
-                onClick={() => handleDelete(property.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-              >
-                🗑 Delete
-              </button>
-              <Link
-                to={`/edit/${property.id}`}
-                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-              >
-                ✏️ Edit
-              </Link>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {properties.map((property, index) => (
+            <div key={index} className="bg-white shadow-md rounded p-4">
+              <img
+                src={
+                  property.image || "https://placehold.co/300x200?text=No+Image"
+                }
+                alt="Property"
+                className="w-full h-40 object-cover mb-3 rounded"
+              />
+              <h3 className="text-lg font-semibold mb-1">{property.title}</h3>
+              <p className="text-gray-600">📍 {property.location}</p>
+              <p className="text-gray-800 font-medium">₹{property.price}/night</p>
+
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={() => handleEdit(index)}
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                >
+                  ✏ Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(index)}
+                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+                >
+                  🗑 Delete
+                </button>
+              </div>
             </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   );

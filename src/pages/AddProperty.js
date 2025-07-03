@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AddProperty() {
   const [title, setTitle] = useState("");
@@ -6,44 +7,44 @@ export default function AddProperty() {
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+
+  const handleAdd = (e) => {
     e.preventDefault();
 
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) {
-      alert("❌ Please log in to add a property.");
-      return;
-    }
-const newProperty = {
-  id: Date.now(), // ✅ unique ID
-  title,
-  location,
-  price,
-  image,
-  owner: user.email,
-};
+    const newProperty = {
+      title,
+      location,
+      price,
+      image,
+      owner: currentUser?.email,
+    };
 
     const existing = JSON.parse(localStorage.getItem("properties")) || [];
     existing.push(newProperty);
     localStorage.setItem("properties", JSON.stringify(existing));
 
-    alert("✅ Property Added!");
-    setTitle("");
-    setLocation("");
-    setPrice("");
-    setImage("");
+    alert("✅ Property added!");
+    navigate("/my-listings");
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">📝 Add New Property</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
+      <form
+        onSubmit={handleAdd}
+        className="bg-white p-6 rounded shadow-md w-full max-w-md"
+      >
+        <h2 className="text-2xl font-bold mb-6 text-purple-700 text-center">
+          🏡 Add Property
+        </h2>
+
         <input
           type="text"
           placeholder="Property Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
           required
         />
 
@@ -52,30 +53,30 @@ const newProperty = {
           placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
           required
         />
 
         <input
           type="number"
-          placeholder="Price per night (₹)"
+          placeholder="Price per night"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
           required
         />
 
         <input
           type="text"
-          placeholder="Image URL"
+          placeholder="Image URL (optional)"
           value={image}
           onChange={(e) => setImage(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full p-2 mb-6 border rounded focus:outline-none focus:ring-2 focus:ring-purple-400"
         />
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
         >
           Add Property
         </button>

@@ -1,88 +1,94 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 export default function EditProperty() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [property, setProperty] = useState({
-    title: "",
-    location: "",
-    price: "",
-    image: "",
-  });
+
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
+  const [price, setPrice] = useState("");
+  const [image, setImage] = useState("");
 
   useEffect(() => {
-    const allListings = JSON.parse(localStorage.getItem("properties")) || [];
-    const found = allListings.find((prop) => prop.id === parseInt(id));
-    if (found) {
-      setProperty(found);
-    } else {
-      alert("Property not found");
-      navigate("/my-listings");
+    const properties = JSON.parse(localStorage.getItem("properties")) || [];
+    const property = properties[id];
+
+    if (property) {
+      setTitle(property.title);
+      setLocation(property.location);
+      setPrice(property.price);
+      setImage(property.image);
     }
-  }, [id, navigate]);
+  }, [id]);
 
-  const handleChange = (e) => {
-    setProperty({ ...property, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
+  const handleUpdate = (e) => {
     e.preventDefault();
 
-    const allListings = JSON.parse(localStorage.getItem("properties")) || [];
-    const updatedListings = allListings.map((prop) =>
-      prop.id === parseInt(id) ? property : prop
-    );
+    const properties = JSON.parse(localStorage.getItem("properties")) || [];
+    properties[id] = {
+      ...properties[id],
+      title,
+      location,
+      price,
+      image,
+    };
 
-    localStorage.setItem("properties", JSON.stringify(updatedListings));
-    alert("✅ Property updated successfully!");
+    localStorage.setItem("properties", JSON.stringify(properties));
+    alert("✅ Property updated!");
     navigate("/my-listings");
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">✏️ Edit Property</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
+      <form
+        onSubmit={handleUpdate}
+        className="bg-white p-6 rounded shadow-md w-full max-w-md"
+      >
+        <h2 className="text-2xl font-bold mb-6 text-yellow-600 text-center">
+          ✏️ Edit Property
+        </h2>
+
         <input
           type="text"
-          name="title"
-          value={property.title}
-          onChange={handleChange}
           placeholder="Property Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
           required
-          className="w-full border p-2 rounded"
         />
+
         <input
           type="text"
-          name="location"
-          value={property.location}
-          onChange={handleChange}
           placeholder="Location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
           required
-          className="w-full border p-2 rounded"
         />
+
         <input
           type="number"
-          name="price"
-          value={property.price}
-          onChange={handleChange}
-          placeholder="Price"
+          placeholder="Price per night"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
           required
-          className="w-full border p-2 rounded"
         />
+
         <input
           type="text"
-          name="image"
-          value={property.image}
-          onChange={handleChange}
-          placeholder="Image URL"
-          className="w-full border p-2 rounded"
+          placeholder="Image URL (optional)"
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+          className="w-full p-2 mb-6 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
         />
+
         <button
           type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
         >
-          ✅ Save Changes
+          Save Changes
         </button>
       </form>
     </div>
