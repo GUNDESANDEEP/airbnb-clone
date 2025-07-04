@@ -12,6 +12,8 @@ export default function Navbar() {
         <Link to="/add-property">Add Property</Link>
         <Link to="/dashboard">Dashboard</Link>
         <Link to="/my-bookings" className="mr-4 text-purple-700">My Bookings</Link>
+        <Link to="/my-bookings">My Bookings</Link>
+
         <button
           onClick={() => {
             localStorage.removeItem("user");

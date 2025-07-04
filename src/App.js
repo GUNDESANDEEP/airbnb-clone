@@ -25,6 +25,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/booking" element={<Booking />} />
+        <Route path="/my-bookings" element={<PrivateRoute><MyBookings /></PrivateRoute>} />
 
         {/* Protected Routes */}
         <Route
