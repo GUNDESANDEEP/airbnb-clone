@@ -12,6 +12,7 @@ import Booking from "./pages/Booking";
 
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
+import MyBookings from "./pages/MyBookings";
 
 function App() {
   return (
@@ -57,7 +58,15 @@ function App() {
               <EditProperty />
             </PrivateRoute>
           }
-        />
+          />
+          <Route
+  path="/my-bookings"
+  element={
+    <PrivateRoute>
+      <MyBookings />
+    </PrivateRoute>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );
