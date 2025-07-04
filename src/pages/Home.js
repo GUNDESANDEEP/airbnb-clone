@@ -1,70 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-export default function Home() {
+const Home = () => {
   const [properties, setProperties] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [search, setSearch] = useState("");
+  const [selectedDates, setSelectedDates] = useState({});
 
   useEffect(() => {
-    const all = JSON.parse(localStorage.getItem("properties")) || [];
-    setProperties(all);
-    setFiltered(all);
+    const storedProperties = JSON.parse(localStorage.getItem("properties")) || [];
+    setProperties(storedProperties);
   }, []);
 
-  const handleSearch = (e) => {
-    const text = e.target.value.toLowerCase();
-    setSearch(text);
+  const handleBooking = (property, date) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 
-    const filteredProps = properties.filter((prop) =>
-      prop.location.toLowerCase().includes(text)
-    );
-    setFiltered(filteredProps);
+    const newBooking = {
+      ...property,
+      date,
+      user: user.email,
+    };
+
+    bookings.push(newBooking);
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+    alert("✅ Booking successful!");
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">
-        🏠 Airbnb Clone
-      </h2>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">🏡 Featured Properties</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {properties.map((property, index) => (
+          <div key={index} className="border p-4 rounded shadow">
+            <img src={property.image} alt={property.title} className="w-full h-48 object-cover rounded" />
+            <h2 className="text-xl font-semibold mt-2">{property.title}</h2>
+            <p className="text-gray-600">{property.location}</p>
+            <p className="text-green-700 font-bold">₹{property.price}/night</p>
 
-      {/* 🔍 Search Bar */}
-      <div className="max-w-xl mx-auto mb-6">
-        <input
-          type="text"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Search by location (e.g. Goa, Hyderabad)"
-          className="w-full p-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-      </div>
+            <DatePicker
+              selected={selectedDates[index]}
+              onChange={(date) =>
+                setSelectedDates((prev) => ({ ...prev, [index]: date }))
+              }
+              placeholderText="📅 Select booking date"
+              className="border p-2 my-2 w-full rounded"
+            />
 
-      {/* 🏡 Property Grid */}
-      {filtered.length === 0 ? (
-        <p className="text-center text-gray-600">No properties found.</p>
-      ) : (
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {filtered.map((property, index) => (
-            <div
-              key={index}
-              className="bg-white p-4 rounded shadow hover:shadow-lg transition"
+            <button
+              onClick={() => handleBooking(property, selectedDates[index])}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
             >
-              <img
-                src={
-                  property.image ||
-                  "https://placehold.co/300x200?text=No+Image"
-                }
-                alt="Property"
-                className="w-full h-40 object-cover mb-3 rounded"
-              />
-              <h3 className="text-xl font-semibold">{property.title}</h3>
-              <p className="text-gray-600">📍 {property.location}</p>
-              <p className="text-gray-800 font-medium">
-                ₹{property.price}/night
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
+              ✅ Book Now
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default Home;

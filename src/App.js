@@ -8,6 +8,7 @@ import AddProperty from "./pages/AddProperty";
 import Dashboard from "./pages/Dashboard";
 import MyListings from "./pages/MyListings";
 import EditProperty from "./pages/EditProperty";
+import Booking from "./pages/Booking";
 
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
@@ -22,6 +23,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/booking" element={<Booking />} />
 
         {/* Protected Routes */}
         <Route

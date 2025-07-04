@@ -1,40 +1,25 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    alert("✅ Logged out successfully!");
-    navigate("/login");
-  };
-
   return (
-    <nav className="bg-white shadow-md px-6 py-3 flex justify-between items-center">
+    <nav className="flex items-center justify-between bg-white p-4 shadow">
       <h1 className="text-2xl font-bold flex items-center gap-2">
-        🏡 <span>Airbnb Clone</span>
+        🏡 Airbnb Clone
       </h1>
-
-      <div className="space-x-4 text-blue-700 font-medium">
+      <div className="flex items-center gap-4 text-purple-800">
         <Link to="/my-listings">My Listings</Link>
         <Link to="/">Home</Link>
         <Link to="/add-property">Add Property</Link>
         <Link to="/dashboard">Dashboard</Link>
-
-        {localStorage.getItem("user") ? (
-          <button
-            onClick={handleLogout}
-            className="text-red-500 hover:underline font-bold"
-          >
-            Logout
-          </button>
-        ) : (
-          <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
-            <Link to="/my-listings">My Listings</Link>
-          </>
-        )}
+        <button
+          onClick={() => {
+            localStorage.removeItem("user");
+            window.location.href = "/login";
+          }}
+          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+        >
+          Logout
+        </button>
       </div>
     </nav>
   );
