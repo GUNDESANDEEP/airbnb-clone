@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../components/Spinner";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 export default function AddProperty() {
@@ -8,6 +9,7 @@ export default function AddProperty() {
   const [location, setLocation] = useState("");
   const [price, setPrice] = useState("");
   const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,14 +19,15 @@ export default function AddProperty() {
       return;
     }
 
-    // ✅ Upload image to Cloudinary using imageFile
+    setLoading(true);
     const imageUrl = await uploadToCloudinary(imageFile);
+    setLoading(false);
+
     if (!imageUrl) {
       alert("Image upload failed!");
       return;
     }
 
-    // 📦 Build property object
     const newProperty = {
       title,
       location,
@@ -36,7 +39,6 @@ export default function AddProperty() {
     const existing = JSON.parse(localStorage.getItem("properties")) || [];
     localStorage.setItem("properties", JSON.stringify([...existing, newProperty]));
 
-    // ✅ Clear form and redirect
     setTitle("");
     setLocation("");
     setPrice("");
@@ -44,38 +46,43 @@ export default function AddProperty() {
     navigate("/my-listings");
   };
 
+  if (loading) return <Spinner />;
+
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Add Property</h2>
-      <form onSubmit={handleSubmit} className="space-y-2 flex flex-col max-w-md">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-2 w-full"
         />
         <input
           type="text"
           placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-2 w-full"
         />
         <input
           type="number"
-          placeholder="Price per night"
+          placeholder="Price"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-2 w-full"
         />
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setImageFile(e.target.files[0])}
-          className="border p-2 rounded"
+          className="border p-2 w-full"
         />
-        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
           Submit
         </button>
       </form>
