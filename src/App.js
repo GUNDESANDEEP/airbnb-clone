@@ -27,6 +27,7 @@ function App() {
         <Route path="/booking" element={<Booking />} />
         <Route path="/my-bookings" element={<PrivateRoute><MyBookings /></PrivateRoute>} />
         <Route path="/edit/:id" element={<EditProperty />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
 
 
         {/* Protected Routes */}
