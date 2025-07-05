@@ -1,93 +1,69 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 export default function EditProperty() {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
-  const [price, setPrice] = useState("");
-  const [image, setImage] = useState("");
+  const [property, setProperty] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
-    const properties = JSON.parse(localStorage.getItem("properties")) || [];
-    const property = properties[id];
-
-    if (property) {
-      setTitle(property.title);
-      setLocation(property.location);
-      setPrice(property.price);
-      setImage(property.image);
-    }
+    const all = JSON.parse(localStorage.getItem("properties")) || [];
+    setProperty(all[id]);
   }, [id]);
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
+    const all = JSON.parse(localStorage.getItem("properties")) || [];
 
-    const properties = JSON.parse(localStorage.getItem("properties")) || [];
-    properties[id] = {
-      ...properties[id],
-      title,
-      location,
-      price,
-      image,
+    let imageUrl = property.image;
+    if (imageFile) {
+      const uploaded = await uploadToCloudinary(imageFile);
+      if (uploaded) imageUrl = uploaded;
+    }
+
+    const updated = {
+      ...property,
+      image: imageUrl,
     };
 
-    localStorage.setItem("properties", JSON.stringify(properties));
+    all[id] = updated;
+    localStorage.setItem("properties", JSON.stringify(all));
     alert("✅ Property updated!");
     navigate("/my-listings");
   };
 
+  if (!property) return <div>Loading...</div>;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
-      <form
-        onSubmit={handleUpdate}
-        className="bg-white p-6 rounded shadow-md w-full max-w-md"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-yellow-600 text-center">
-          ✏️ Edit Property
-        </h2>
-
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">Edit Property</h2>
+      <form onSubmit={handleUpdate} className="space-y-4">
         <input
           type="text"
-          placeholder="Property Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          required
+          value={property.title}
+          onChange={(e) => setProperty({ ...property, title: e.target.value })}
+          placeholder="Title"
         />
-
         <input
           type="text"
+          value={property.location}
+          onChange={(e) => setProperty({ ...property, location: e.target.value })}
           placeholder="Location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          required
         />
-
         <input
           type="number"
-          placeholder="Price per night"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          required
+          value={property.price}
+          onChange={(e) => setProperty({ ...property, price: e.target.value })}
+          placeholder="Price"
         />
-
         <input
-          type="text"
-          placeholder="Image URL (optional)"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
-          className="w-full p-2 mb-6 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImageFile(e.target.files[0])}
         />
-
-        <button
-          type="submit"
-          className="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-        >
+        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
           Save Changes
         </button>
       </form>
