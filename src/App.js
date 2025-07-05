@@ -1,79 +1,40 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Login from "./pages/Login";
 import AddProperty from "./pages/AddProperty";
-import Dashboard from "./pages/Dashboard";
 import MyListings from "./pages/MyListings";
 import EditProperty from "./pages/EditProperty";
-import Booking from "./pages/Booking";
-
-import Navbar from "./components/Navbar";
-import PrivateRoute from "./components/PrivateRoute";
+import Dashboard from "./pages/Dashboard";
 import MyBookings from "./pages/MyBookings";
+import PrivateRoute from "./components/PrivateRoute";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Navbar />
+  return (
+    <>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/add-property" element={<PrivateRoute><AddProperty /></PrivateRoute>} />
+          <Route path="/my-listings" element={<PrivateRoute><MyListings /></PrivateRoute>} />
+          <Route path="/edit-property/:index" element={<PrivateRoute><EditProperty /></PrivateRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/my-bookings" element={<PrivateRoute><MyBookings /></PrivateRoute>} />
+        </Routes>
+      </BrowserRouter>
 
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/booking" element={<Booking />} />
-        <Route path="/my-bookings" element={<PrivateRoute><MyBookings /></PrivateRoute>} />
-        <Route path="/edit/:id" element={<EditProperty />} />
-        <Route path="/my-bookings" element={<MyBookings />} />
-
-
-        {/* Protected Routes */}
-        <Route
-          path="/add-property"
-          element={
-            <PrivateRoute>
-              <AddProperty />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/my-listings"
-          element={
-            <PrivateRoute>
-              <MyListings />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/edit/:id"
-          element={
-            <PrivateRoute>
-              <EditProperty />
-            </PrivateRoute>
-          }
-          />
-          <Route
-  path="/my-bookings"
-  element={
-    <PrivateRoute>
-      <MyBookings />
-    </PrivateRoute>
-  }
-/>
-      </Routes>
-    </BrowserRouter>
-  );
+      {/* ✅ Toast Popup Handler */}
+      <ToastContainer position="top-center" />
+    </>
+  );
 }
 
 export default App;
