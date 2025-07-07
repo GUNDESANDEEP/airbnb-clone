@@ -1,51 +1,69 @@
 import React, { useEffect, useState } from "react";
+import { FaTrash, FaEdit } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function MyListings() {
-  const [myProperties, setMyProperties] = useState([]);
-  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const [myListings, setMyListings] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
     const allProperties = JSON.parse(localStorage.getItem("properties")) || [];
-    const userProperties = allProperties.filter(
-      (p) => p.owner === currentUser?.email
+    const filtered = allProperties.filter(
+      (prop) => prop.owner === user?.email
     );
-    setMyProperties(userProperties);
+    setMyListings(filtered);
   }, []);
 
-  const handleDelete = (indexToDelete) => {
-    const updated = myProperties.filter((_, index) => index !== indexToDelete);
-    setMyProperties(updated);
+  const handleDelete = (index) => {
+    const updatedListings = [...myListings];
+    updatedListings.splice(index, 1);
 
-    // Also update localStorage
-    const all = JSON.parse(localStorage.getItem("properties")) || [];
-    const updatedAll = all.filter(
-      (p) => !(p.owner === currentUser?.email && myProperties.indexOf(p) === indexToDelete)
+    setMyListings(updatedListings);
+
+    // Also remove from localStorage
+    const allProperties = JSON.parse(localStorage.getItem("properties")) || [];
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const updatedAll = allProperties.filter(
+      (prop) =>
+        !(
+          prop.owner === user?.email &&
+          prop.title === myListings[index].title &&
+          prop.location === myListings[index].location
+        )
     );
     localStorage.setItem("properties", JSON.stringify(updatedAll));
+  };
+
+  const handleEdit = (property) => {
+    navigate("/edit-property", { state: property });
   };
 
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">📋 My Listings</h2>
-      {myProperties.length === 0 ? (
-        <p>No listings found. Add some!</p>
+
+      {myListings.length === 0 ? (
+        <p>No listings yet. Go add a property!</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {myProperties.map((property, index) => (
+        <div className="grid gap-4">
+          {myListings.map((property, index) => (
             <div key={index} className="border p-4 rounded shadow">
-              <img
-                src={property.image || "https://placehold.co/300x200?text=No+Image"}
-                alt="Property"
-                className="w-full h-48 object-cover mb-2"
-              />
               <h3 className="text-xl font-semibold">{property.title}</h3>
               <p>📍 {property.location}</p>
               <p>💰 ₹{property.price}/night</p>
 
               <div className="mt-2 space-x-2">
                 <button
+                  onClick={() => handleEdit(property)}
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded"
+                >
+                  ✏ Edit
+                </button>
+                <button
                   onClick={() => handleDelete(index)}
-                  className="bg-red-600 text-white px-3 py-1 rounded"
+                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
                 >
                   🗑 Delete
                 </button>
