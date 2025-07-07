@@ -10,7 +10,7 @@ import EditProperty from "./pages/EditProperty";
 import Dashboard from "./pages/Dashboard";
 import MyBookings from "./pages/MyBookings";
 import PrivateRoute from "./components/PrivateRoute";
-
+import NotFound from "./pages/NotFound";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -28,6 +28,7 @@ function App() {
           <Route path="/edit-property/:index" element={<PrivateRoute><EditProperty /></PrivateRoute>} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/my-bookings" element={<PrivateRoute><MyBookings /></PrivateRoute>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
 
